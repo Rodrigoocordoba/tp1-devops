@@ -1,0 +1,16 @@
+# Entornos virtuales
+.venv/
+env/
+venv/
+
+# Caches
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Archivos sensibles
+.env
+
+# Archivos de editor
+.vscode/
+.idea/
