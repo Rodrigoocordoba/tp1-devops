@@ -1,0 +1,53 @@
+name: CI - Pytest + Coverage
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Tu paquete 'app' está dentro de 'HoraActual', por eso seteamos PYTHONPATH.
+      - name: Run pytest with coverage
+        env:
+          PYTHONPATH: "${{ github.workspace }}/HoraActual"
+          # DEFAULT_TZ: "UTC"  # no hace falta porque tus tests ya la fuerzan
+        run: |
+          pytest --cov=app --cov-report=term-missing -q
+
+      # (Opcional) Generar y subir reporte HTML de cobertura como artefacto
+      - name: Generate HTML coverage
+        if: always()
+        env:
+          PYTHONPATH: "${{ github.workspace }}/HoraActual"
+        run: |
+          pytest --cov=app --cov-report=html -q
+        # lo subimos para verlo/descargarlo desde la corrida del workflow
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
