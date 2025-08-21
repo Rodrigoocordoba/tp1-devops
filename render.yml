@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: hora-actual
+    env: python
+    plan: free
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt
+    startCommand: PYTHONPATH=HoraActual gunicorn -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:$PORT app.main:app
+    envVars:
+      - key: DEFAULT_TZ
+        value: America/Argentina/Buenos_Aires
+      - key: PYTHONPATH
+        value: HoraActual
